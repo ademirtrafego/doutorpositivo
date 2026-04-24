@@ -1,0 +1,26 @@
+# robots.txt — Doutor Positivo
+# https://www.doutorpositivo.com.br
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /wp-admin/
+Disallow: /*.json$
+Disallow: /*?*utm_
+Disallow: /*?*fbclid
+
+# Bots específicos
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+# Sitemap
+Sitemap: https://www.doutorpositivo.com.br/sitemap.xml

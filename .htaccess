@@ -1,0 +1,87 @@
+# ============================================
+# .htaccess — Doutor Positivo
+# Otimizações de performance e SEO
+# (requer servidor Apache)
+# ============================================
+
+# ---- FORÇAR HTTPS ----
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Forçar www (remova o bloco inteiro se NÃO quiser www)
+  RewriteCond %{HTTP_HOST} ^doutorpositivo\.com\.br$ [NC]
+  RewriteRule ^(.*)$ https://www.doutorpositivo.com.br/$1 [L,R=301]
+
+  # Remover .html das URLs
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^([^\.]+)$ $1.html [NC,L]
+
+  # Se acessar com .html, redirecionar para sem .html (evita conteúdo duplicado)
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.html [NC]
+  RewriteRule ^ %1 [R=301,L]
+</IfModule>
+
+# ---- PÁGINA DE ERRO 404 ----
+ErrorDocument 404 /404.html
+
+# ---- COMPRESSÃO GZIP ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+  AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/rss+xml
+  AddOutputFilterByType DEFLATE image/svg+xml font/opentype font/ttf font/eot font/otf
+</IfModule>
+
+# ---- CACHE NO NAVEGADOR ----
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+
+  ExpiresByType text/html "access plus 1 hour"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType application/x-javascript "access plus 1 year"
+
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+
+  ExpiresByType font/ttf "access plus 1 year"
+  ExpiresByType font/otf "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType application/font-woff "access plus 1 year"
+
+  ExpiresByType application/xml "access plus 1 hour"
+  ExpiresByType application/rss+xml "access plus 1 hour"
+</IfModule>
+
+# ---- HEADERS DE SEGURANÇA ----
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "geolocation=(), camera=(), microphone=()"
+
+  # HSTS (ative só após garantir que HTTPS funciona em todo o site)
+  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # Cache control mais agressivo para estáticos
+  <FilesMatch "\.(ico|pdf|jpg|jpeg|png|webp|gif|svg|css|js|woff|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# ---- CHARSET PADRÃO ----
+AddDefaultCharset UTF-8
+
+# ---- BLOQUEAR ACESSO A ARQUIVOS SENSÍVEIS ----
+<FilesMatch "^(\.htaccess|\.htpasswd|\.git|\.env|composer\.json|package\.json)$">
+  Require all denied
+</FilesMatch>
